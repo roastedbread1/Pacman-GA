@@ -139,7 +139,7 @@ class Game:
     #
 
     def run(self):
-        self.waitForInput()
+        # self.waitForInput()
         self.window.fill(BLACK)
         self.map.drawMap(self.window)
         self.pillMap.drawPills()
