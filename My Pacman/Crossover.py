@@ -18,4 +18,4 @@ populations = create_init_population_bin(game_length, pop_count)
 
 print(len(populations[0]), len(populations[1]))
 
-print(crossover(225, populations[0], populations[1]))
+# print(crossover(225, populations[0], populations[1]))
