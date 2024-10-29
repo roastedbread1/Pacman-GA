@@ -2,18 +2,23 @@ import random
 from GAPopInit import *
 
 
-def mutation(child, n):
-    li = [random.randint(0, 1<<32-1) for i in range(n)]
-    result = [0]*n
+def mutation(child):
+    n = len(child)
+    li = [random.randint(0, 1 << 32 - 1) for i in range(n)]
     for i in range(n):
-        result[i] = child[i] ^ li[i]
-    
-    return result
+        child[i] ^= li[i]
+    return child
 
+def mutation(child, probability):
+    n = len(child)
+    li = [random.randint(0, 1 << 32 - 1) for i in range(n)]
+    for i in range(n):
+        if (random.random() < probability):
+            child[i] = mutate_gene(child[i], probability)
+    return child
 
-game_length = 60 * 60   # also as chromosome_length, gene_count
-pop_count = 1
-
-populations = create_init_population_bin(game_length, pop_count)
-
-print(mutation(populations[0], 225))
+def mutate_gene(gene, probability):
+    for i in range(16):
+        if (random.random() < probability):
+            gene ^= random.randint(0, 3) << (i * 2)
+    return gene

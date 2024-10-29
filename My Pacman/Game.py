@@ -182,7 +182,8 @@ class Game:
 
             #do this for all four ghosts
             if self.pacman.checkCollision([self.pinky, self.inky, self.blinky, self.clyde]):
-                pygame.time.wait(2000)
+                o = 0
+                # pygame.time.wait(2000)
             pygame.display.update()
             self.clock.tick(TICK)
             if self.pacman.lives == 0 or self.pillMap.noPills():
