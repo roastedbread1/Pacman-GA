@@ -12,6 +12,12 @@ game_length = 16       # also as chromosome_length, gene_count
 
 input_delay = 10
 
+def early_stop_check(n_last_fitnesses):
+    c = len(n_last_fitnesses) - 1
+    sum = 0
+    for i in range(c):
+        sum += abs(n_last_fitnesses[i+1] - n_last_fitnesses[i])
+    return sum / c < basically_the_same_threshold
 
 def tournament_selection(populations, pop_fitnesses, tournament_size):
     tournament = random.sample(
@@ -86,12 +92,13 @@ def pacman_ga(populations, mating_times, mutation_probability, tournament_size):
     return new_populations, (max_fitness, average_fitness)
 
 
+
 # MAIN #
 
-# parameters
-pop_count = 3              # population count for each generation
+
+pop_count = 3               # population count for each generation
 mating_times = 2            # how many times crossover attempted. child_count = 2 * mating_times
-mutation_probability = 0.5  # probability of mutation
+mutation_probability = 0.1  # probability of mutation
 tournament_size = 3         # how many entree in a tournament
 
 populations = create_init_population_bin(game_length, pop_count)
@@ -102,6 +109,12 @@ for i in range(max_generation):
     print(f'generation {i+1}')
     populations, report = pacman_ga(populations, mating_times, mutation_probability, tournament_size)
     generation_history.append(report)
+
+    # early stop if it's getting stagnant
+    if (i >= patience) and early_stop_check(generation_history[-patience:]):
+        break
+
+
     print('')
 
 # end loop
