@@ -1,4 +1,5 @@
 from Game import *
+from Simulation1 import *
 from GAPopInit import *
 from Crossover import *
 from Selection import *
