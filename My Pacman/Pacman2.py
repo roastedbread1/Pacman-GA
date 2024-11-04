@@ -6,7 +6,7 @@ from Mutation import *
 
 # hyperparameters
 max_generation = 250
-basically_the_same_threshold = 1e-5
+basically_the_same_threshold = 1
 game_length = 60 * 60       # also as chromosome_length, gene_count
 input_delay = 10
 
@@ -82,16 +82,17 @@ def pacman_ga(populations, pop_fitnesses, params):
     sorted_individuals = sorted(
         zip(combined_population, combined_fitnesses), key=lambda x: x[1], reverse=True)
 
-    average_fitness = sum(combined_fitnesses) / len(combined_fitnesses)
-    max_fitness = sorted_individuals[0][1]
-
-    print(f'generation max fitness {max_fitness}')
-    print(f'generation avg fitness {average_fitness}')
 
     new_populations = [individual for individual,
                        fitness in sorted_individuals[:len(populations)]]
     new_fitnesses = [fitness for individual,
                        fitness in sorted_individuals[:len(populations)]]
+
+    max_fitness = new_populations[0][1]
+    average_fitness = sum(new_fitnesses) / len(new_fitnesses)
+
+    print(f'generation max fitness {max_fitness}')
+    print(f'generation avg fitness {average_fitness}')
 
     return new_populations, new_fitnesses, (max_fitness, average_fitness)
 
@@ -118,6 +119,7 @@ def simulate(params):
     
     print(f'generation {0}')
     pop_fitnesses = calculate_population_fitness(populations) 
+    print('')
 
     generation_history = []
 
@@ -145,6 +147,7 @@ def simulate_writefile(params):
     print(f'generation {0}')
     pop_fitnesses = calculate_population_fitness(populations) 
     generation_history = []
+    print('')
 
     for i in range(params.max_generation):
         print(f'generation {i+1}')
@@ -170,9 +173,9 @@ def simulate_writefile(params):
 
 # MAIN #
 
-pop_count_list = [10, 20, 30, 100]
-mating_times_list = [10, 15, 20, 50]
-mutation_probability_list = [0.05, 0.1, 0.15, 0.75]
+pop_count_list = [30, 50, 100]
+mating_times_list = [10, 20, 50]
+mutation_probability_list = [0.05, 0.15, 0.75]
 tournament_size_list = [3, 5]
 
 for pc in pop_count_list:
@@ -186,8 +189,8 @@ for pc in pop_count_list:
                     mating_times = mt,
                     mutation_probability = mp,
                     tournament_size = ts,
-                    patience = 5,
-                    max_generation = 250
+                    patience = 3,
+                    max_generation = 40
                 )
                 simulate_writefile(params)
             
