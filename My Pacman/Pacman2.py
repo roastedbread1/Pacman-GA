@@ -88,7 +88,7 @@ def pacman_ga(populations, pop_fitnesses, params):
     new_fitnesses = [fitness for individual,
                        fitness in sorted_individuals[:len(populations)]]
 
-    max_fitness = new_populations[0][1]
+    max_fitness = new_fitnesses[0]
     average_fitness = sum(new_fitnesses) / len(new_fitnesses)
 
     print(f'generation max fitness {max_fitness}')
