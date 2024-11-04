@@ -2,14 +2,13 @@ from Game import *
 from Simulation1 import *
 from GAPopInit import *
 from Crossover import *
-from Selection import *
 from Mutation import *
 
 # hyperparameters
 max_generation = 250
 patience = 5
 basically_the_same_threshold = 0.001
-game_length = 60 * 60       # also as chromosome_length, gene_count
+game_length = 16       # also as chromosome_length, gene_count
 
 input_delay = 10
 
@@ -43,12 +42,15 @@ def calculate_population_fitness(population):
 
 
 def pacman_ga(populations, mating_times, mutation_probability, tournament_size):
+
+    print(populations)
+
     pop_fitnesses = calculate_population_fitness(populations)
 
     mating_pool_size = len(populations)
     mating_pool = random.choices(
         populations, weights=pop_fitnesses, k=mating_pool_size)
-
+    
     children = []
     for i in range(mating_times):
         parent1 = tournament_selection(
@@ -73,7 +75,7 @@ def pacman_ga(populations, mating_times, mutation_probability, tournament_size):
         zip(combined_population, combined_fitnesses), key=lambda x: x[1], reverse=True)
 
     average_fitness = sum(combined_fitnesses) / len(combined_fitnesses)
-    max_fitness = combined_fitnesses[-1]
+    max_fitness = sorted_individuals[0][1]
 
     print(f'generation max fitness {max_fitness}')
     print(f'generation avg fitness {average_fitness}')
@@ -81,14 +83,14 @@ def pacman_ga(populations, mating_times, mutation_probability, tournament_size):
     new_populations = [individual for individual,
                        fitness in sorted_individuals[:len(populations)]]
 
-    return new_populations, max_fitness, average_fitness
+    return new_populations, (max_fitness, average_fitness)
 
 
 # MAIN #
 
 # parameters
-pop_count = 10              # population count for each generation
-mating_times = 5            # how many times crossover attempted. child_count = 2 * mating_times
+pop_count = 3              # population count for each generation
+mating_times = 2            # how many times crossover attempted. child_count = 2 * mating_times
 mutation_probability = 0.5  # probability of mutation
 tournament_size = 3         # how many entree in a tournament
 
@@ -98,8 +100,8 @@ generation_history = []
 
 for i in range(max_generation):
     print(f'generation {i+1}')
-    populations, max, avg = pacman_ga(populations, mating_times, mutation_probability, tournament_size)
-    generation_history.append((max, avg))
+    populations, report = pacman_ga(populations, mating_times, mutation_probability, tournament_size)
+    generation_history.append(report)
     print('')
 
 # end loop
