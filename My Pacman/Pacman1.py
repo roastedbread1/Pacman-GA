@@ -5,20 +5,13 @@ from Crossover import *
 from Selection import *
 from Mutation import *
 
+# hyperparameters
+max_generation = 250
+patience = 5
+basically_the_same_threshold = 0.001
+game_length = 60 * 60       # also as chromosome_length, gene_count
+
 input_delay = 10
-
-# parameters
-game_length = 60            # also as chromosome_length, gene_count
-pop_count = 10              # population count for each generation
-mating_pool_size = 10       # how many individuals are probable to crossover
-# how many times crossover attempted. child_count = 2 * mating_times
-mating_times = 5
-mutation_probability = 0.5  # probability of mutation
-tournament_entrant_count = 2      # how many entree in a tournament
-
-
-# one loop
-populations = create_init_population_bin(game_length, pop_count)
 
 
 def tournament_selection(populations, pop_fitnesses, tournament_size):
@@ -49,7 +42,7 @@ def calculate_population_fitness(population):
     return fitnesses
 
 
-def pacman_ga(populations):
+def pacman_ga(populations, mating_times, mutation_probability, tournament_size):
     pop_fitnesses = calculate_population_fitness(populations)
 
     mating_pool_size = len(populations)
@@ -59,17 +52,13 @@ def pacman_ga(populations):
     children = []
     for i in range(mating_times):
         parent1 = tournament_selection(
-            mating_pool, pop_fitnesses, tournament_size=3)
+            mating_pool, pop_fitnesses, tournament_size)
         parent2 = tournament_selection(
-            mating_pool, pop_fitnesses, tournament_size=3)
+            mating_pool, pop_fitnesses, tournament_size)
 
         child1, child2 = crossover(parent1, parent2)
         children.append(child1)
         children.append(child2)
-
-    # for i in range(len(children)):
-    #     if random.random() < mutation_probability:
-    #         children[i] = mutation(children[i], mutation_probability)
 
     for i in range(len(children)):
         children[i] = mutation(children[i], mutation_probability)
@@ -83,15 +72,34 @@ def pacman_ga(populations):
     sorted_individuals = sorted(
         zip(combined_population, combined_fitnesses), key=lambda x: x[1], reverse=True)
 
+    average_fitness = sum(combined_fitnesses) / len(combined_fitnesses)
+    max_fitness = combined_fitnesses[-1]
+
+    print(f'generation max fitness {max_fitness}')
+    print(f'generation avg fitness {average_fitness}')
+
     new_populations = [individual for individual,
-                       fitness in sorted_individuals[:pop_count]]
+                       fitness in sorted_individuals[:len(populations)]]
 
-    return new_populations
+    return new_populations, max_fitness, average_fitness
 
 
-for i in range(10):
+# MAIN #
+
+# parameters
+pop_count = 10              # population count for each generation
+mating_times = 5            # how many times crossover attempted. child_count = 2 * mating_times
+mutation_probability = 0.5  # probability of mutation
+tournament_size = 3         # how many entree in a tournament
+
+populations = create_init_population_bin(game_length, pop_count)
+
+generation_history = []
+
+for i in range(max_generation):
     print(f'generation {i+1}')
-    populations = pacman_ga(populations)
+    populations, max, avg = pacman_ga(populations, mating_times, mutation_probability, tournament_size)
+    generation_history.append((max, avg))
     print('')
 
 # end loop
