@@ -25,8 +25,13 @@ def tournament_selection(populations, pop_fitnesses, tournament_size):
     winner = max(tournament, key=lambda x: x[1])
     return winner[0]
 
+def print_population_fitness(pop_fitnesses, individu_name='individual'):
+    i = 0
+    for fit in pop_fitnesses:
+        i += 1
+        print(f'{individu_name} {i} Fitness: {fit}')
 
-def calculate_population_fitness(population):
+def calculate_population_fitness(population, individu_name='individual'):
     fitnesses = []
     i = 0
     for individual in population:
@@ -40,36 +45,36 @@ def calculate_population_fitness(population):
             game.frameElapsed // input_delay
         fitness = calculate_fitness(points, time_left)
 
-        print(f'Individual {i+1} Fitness: {fitness}')
+        print(f'{individu_name} {i+1} Fitness: {fitness}')
         i += 1
         fitnesses.append(fitness)
     return fitnesses
 
 
-def pacman_ga(populations, mating_times, mutation_probability, tournament_size):
+def pacman_ga(populations, pop_fitnesses, params):
 
-    pop_fitnesses = calculate_population_fitness(populations)
+    print_population_fitness(pop_fitnesses)
 
     mating_pool_size = len(populations)
     mating_pool = random.choices(
         populations, weights=pop_fitnesses, k=mating_pool_size)
     
     children = []
-    for i in range(mating_times):
+    for i in range(params.mating_times):
         parent1 = tournament_selection(
-            mating_pool, pop_fitnesses, tournament_size)
+            mating_pool, pop_fitnesses, params.tournament_size)
         parent2 = tournament_selection(
-            mating_pool, pop_fitnesses, tournament_size)
+            mating_pool, pop_fitnesses, params.tournament_size)
 
         child1, child2 = crossover(parent1, parent2)
         children.append(child1)
         children.append(child2)
 
     for i in range(len(children)):
-        children[i] = mutation(children[i], mutation_probability)
+        children[i] = mutation(children[i], params.mutation_probability)
 
     combined_population = populations + children
-    children_fitnesses = calculate_population_fitness(children)
+    children_fitnesses = calculate_population_fitness(children, individu_name='child')
 
     combined_fitnesses = pop_fitnesses + children_fitnesses
     # combined_fitnesses = calculate_population_fitness(combined_population)
@@ -85,8 +90,10 @@ def pacman_ga(populations, mating_times, mutation_probability, tournament_size):
 
     new_populations = [individual for individual,
                        fitness in sorted_individuals[:len(populations)]]
+    new_fitnesses = [fitness for individual,
+                       fitness in sorted_individuals[:len(populations)]]
 
-    return new_populations, (max_fitness, average_fitness)
+    return new_populations, new_fitnesses, (max_fitness, average_fitness)
 
 
 class SimulationParams:
@@ -108,12 +115,15 @@ class SimulationParams:
 def simulate(params):
 
     populations = create_init_population_bin(params.game_length, params.pop_count)
+    
+    print(f'generation {0}')
+    pop_fitnesses = calculate_population_fitness(populations) 
 
     generation_history = []
 
     for i in range(params.max_generation):
         print(f'generation {i+1}')
-        populations, gen_result = pacman_ga(populations, params.mating_times, params.mutation_probability, params.tournament_size)
+        populations, pop_fitnesses, gen_result = pacman_ga(populations, pop_fitnesses, params)
         generation_history.append(gen_result)
 
         # early stop if it's getting stagnant
@@ -131,13 +141,16 @@ def simulate_writefile(params):
     report.write('\n')
 
     populations = create_init_population_bin(params.game_length, params.pop_count)
+
+    print(f'generation {0}')
+    pop_fitnesses = calculate_population_fitness(populations) 
     generation_history = []
 
     for i in range(params.max_generation):
         print(f'generation {i+1}')
-        report.write(f'gen {i}\n')
+        report.write(f'gen {i+1}\n')
 
-        populations, gen_result = pacman_ga(populations, params.mating_times, params.mutation_probability, params.tournament_size)
+        populations, pop_fitnesses, gen_result = pacman_ga(populations, pop_fitnesses, params)
         generation_history.append(gen_result)
 
         report.write(f'max: {gen_result[0]}\n')
@@ -182,14 +195,14 @@ for pc in pop_count_list:
 
 # params = SimulationParams(
 #     game_length = 16,
-#     pop_count = 2,
-#     mating_times = 5,
+#     pop_count = 3,
+#     mating_times = 1,
 #     mutation_probability = 0.1,
 #     tournament_size = 2,
 #     patience = 2,
 #     max_generation = 250
 # )
-# simulate(params)
+# simulate_writefile(params)
 
 
 
