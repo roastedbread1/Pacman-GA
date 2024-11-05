@@ -146,7 +146,7 @@ class Game:
         # pygame.display.update()
 
         while self.running:
-            # pygame.display.update()
+            pygame.display.update()
 
             #
             if (self.isInputInjected and self.frameElapsed % self.readInputFrame == 0):

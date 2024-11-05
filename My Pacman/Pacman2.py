@@ -173,10 +173,10 @@ def simulate_writefile(params):
 
 # MAIN #
 
-pop_count_list = [30, 50, 100]
-mating_times_list = [10, 20, 50]
-mutation_probability_list = [0.05, 0.15, 0.75]
-tournament_size_list = [3, 5]
+pop_count_list = [50]
+mating_times_list = [20]
+mutation_probability_list = [0.75]
+tournament_size_list = [3]
 
 for pc in pop_count_list:
     for mt in mating_times_list:
